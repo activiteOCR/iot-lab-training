@@ -1,5 +1,5 @@
 ## Welcome to the IoT-LAB training resources
-
+V0.1.0
 ### Description
 
 This repository contains the Jupyter Notebooks available at
