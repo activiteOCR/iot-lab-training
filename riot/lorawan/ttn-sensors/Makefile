@@ -5,12 +5,12 @@ APPLICATION = ttn-sensors
 BOARD ?= b-l072z-lrwan1
 
 RIOTBASE ?= $(CURDIR)/../../RIOT
-
+#RIOTBASE ?= /home/jovyan/work/old-training/riot/RIOT
 #
 # Here we add the modules that are needed
 #
 USEMODULE += ztimer_msec
-
+USEMODULE += hts221
 #
 # The application needs LoRaWAN related modules and variables:
 #
