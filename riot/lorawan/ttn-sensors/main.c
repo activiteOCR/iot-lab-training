@@ -53,7 +53,7 @@ static const uint8_t appkey[LORAMAC_APPKEY_LEN] = { 0xD1, 0xB8, 0x4A, 0xF8, 0x2B
 
 static void *thread_handler(void *arg)
 {
-    printf("thread2\t\n");
+    printf("thread1\t\n");
     (void)arg;
     while (1) {
          /* do some measurements */
@@ -93,14 +93,15 @@ static void *_wait_recv(void *arg)
     msg_init_queue(_loramac_recv_queue, LORAMAC_RECV_MSG_QUEUE);
     (void)arg;
     while (1) {
-        ztimer_sleep(ZTIMER_MSEC, 2 * MS_PER_SEC);
-        printf("thread1\t\n");
         /* blocks until something is received */
-       /* switch (semtech_loramac_recv(&loramac)) {
+       switch (semtech_loramac_recv(&loramac)) {
             case SEMTECH_LORAMAC_RX_DATA:
                 loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
                 printf("Data received: %s, port: %d\n",
                 (char *)loramac.rx_data.payload, loramac.rx_data.port);
+                LED2_ON;
+                ztimer_sleep(ZTIMER_MSEC, 10 * MS_PER_SEC);
+                LED2_OFF;
                 break;
 
             case SEMTECH_LORAMAC_RX_LINK_CHECK:
@@ -121,7 +122,7 @@ static void *_wait_recv(void *arg)
 
             default:
                 break;
-        }*/
+        }
     }
     return NULL;
 }
@@ -129,7 +130,7 @@ static void *_wait_recv(void *arg)
 int main(void)
 {
     gpio_init(LED2_PIN, GPIO_OUT);
-    LED2_ON;
+    //LED2_ON;
     
     if (hts221_init(&hts221, &hts221_params[0]) != HTS221_OK) {
         puts("Sensor initialization failed");
@@ -146,20 +147,20 @@ int main(void)
         return 1;
     }
     /* initialize the radio driver */
-sx127x_setup(&sx127x, &sx127x_params[0], 0);
+    sx127x_setup(&sx127x, &sx127x_params[0], 0);
     loramac.netdev = &sx127x.netdev;
     loramac.netdev->driver = &sx127x_driver;
 
     /* initialize loramac stack */
- semtech_loramac_init(&loramac);
+    semtech_loramac_init(&loramac);
 
     /* configure the device parameters */
- semtech_loramac_set_deveui(&loramac, deveui);
+    semtech_loramac_set_deveui(&loramac, deveui);
     semtech_loramac_set_appeui(&loramac, appeui);
     semtech_loramac_set_appkey(&loramac, appkey);
 
     /* change datarate to DR5 (SF7/BW125kHz) */
-semtech_loramac_set_dr(&loramac, 5);
+    semtech_loramac_set_dr(&loramac, 5);
     
     /* start the OTAA join procedure */
 if (semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
